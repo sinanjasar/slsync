@@ -1,12 +1,27 @@
-# slsync-audio-tool
+# slsync
 
-This Python tool monitors specified download folders for new files. When a new file is detected, it:
+slsync monitors your specified download folder(s) for new files. it extracts zip files, recursively filters audio files with your chosen extensions, converts them to alac, and moves them to your music library. if artwork is missing, it’ll embed any included images or try to fetch artwork from the web.
 
-1. Unzips ZIP files.
-2. Checks for audio files.
-3. Converts non-ALAC audio files to ALAC.
-4. Moves ALAC files to `/path/to/your/music/import/folder` for automatic import into Apple Music.
+## installation
 
-## Configuration
+clone the repo and run:
+```sh
+bash setup.sh
+```
 
-Edit the script to specify your download folders
+## usage
+
+start monitoring:
+```sh
+slsync
+```
+
+## requirements
+
+- macos
+
+## setup script
+
+- creates python venv
+- installs dependencies
+- creates symlink
