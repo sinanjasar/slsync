@@ -9,4 +9,4 @@ This Python tool monitors specified download folders for new files. When a new f
 
 ## Configuration
 
-Edit the script to specify your download folders and destination folder if needed.
+Edit the script to specify your download folders
