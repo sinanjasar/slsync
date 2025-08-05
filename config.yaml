@@ -1,0 +1,16 @@
+# slsync config file
+# Edit these paths to match your system
+
+DOWNLOAD_FOLDERS:
+  - /path/to/your/downloads
+  # Add more folders as needed
+DEST_FOLDER: /path/to/your/music/import/folder
+
+SUPPORTED_EXTENSIONS:
+  - .mp3
+  - .flac
+  - .wav
+  - .aac
+  - .m4a
+  - .ogg
+  - .alac
