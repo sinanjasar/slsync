@@ -2,9 +2,10 @@
 # Edit these paths to match your system
 
 DOWNLOAD_FOLDERS:
-  - /path/to/your/downloads
+  - /Users/sinanjasar/Downloads
+  - /Users/sinanjasar/Music/Soulseek/Downloads/complete
   # Add more folders as needed
-DEST_FOLDER: /path/to/your/music/import/folder
+DEST_FOLDER: "/Users/sinanjasar/Music/crazyniga2141/Media.localized/Automatically Add to Music.localized"
 
 SUPPORTED_EXTENSIONS:
   - .mp3
