@@ -1,2 +1,4 @@
 .github
 album_art_helper.py
+.DS_Store
+__pycache__/
