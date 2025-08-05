@@ -1,3 +1,5 @@
+#! /Users/sinanjasar/slsync/.venv/bin/python
+
 import os
 import time
 import shutil
@@ -11,7 +13,9 @@ import yaml
 from tqdm import tqdm
 
 # Load config from config.yaml
-with open('config.yaml', 'r') as f:
+script_dir = os.path.dirname(os.path.realpath(__file__))
+config_path = os.path.join(script_dir, 'config.yaml')
+with open(config_path, 'r') as f:
     config = yaml.safe_load(f)
 DOWNLOAD_FOLDERS = config['DOWNLOAD_FOLDERS']
 DEST_FOLDER = config['DEST_FOLDER']
