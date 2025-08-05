@@ -19,3 +19,17 @@ pip install --upgrade pip
 pip install watchdog mutagen ffmpeg-python pyyaml requests tqdm
 
 echo "Dependencies installed in $VENV_DIR."
+
+
+# Get the directory of the setup script (assumes main.py is in the same directory)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Remove any existing symlink or file
+if [ -L /usr/local/bin/slsync ] || [ -e /usr/local/bin/slsync ]; then
+    sudo rm /usr/local/bin/slsync
+fi
+
+# Create the symlink
+sudo ln -s "$SCRIPT_DIR/main.py" /usr/local/bin/slsync
+
+echo "Symlink created: /usr/local/bin/slsync -> $SCRIPT_DIR/main.py"
