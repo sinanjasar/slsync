@@ -16,7 +16,15 @@ fi
 # Activate venv and install dependencies
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
-pip install watchdog mutagen ffmpeg-python pyyaml requests tqdm
+
+echo "Installing dependencies..."
+pip install \
+    'watchdog>=3.0,<4.0' \
+    'mutagen>=1.45,<2.0' \
+    'ffmpeg-python>=0.2,<1.0' \
+    'pyyaml>=6.0,<7.0' \
+    'requests>=2.28,<3.0' \
+    'tqdm>=4.64,<5.0'
 
 echo "Dependencies installed in $VENV_DIR."
 
