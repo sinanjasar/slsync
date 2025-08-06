@@ -37,7 +37,16 @@ if [ -L /usr/local/bin/slsync ] || [ -e /usr/local/bin/slsync ]; then
     sudo rm /usr/local/bin/slsync
 fi
 
-# Create the symlink
-sudo ln -s "$SCRIPT_DIR/main.py" /usr/local/bin/slsync
 
-echo "Symlink created: /usr/local/bin/slsync -> $SCRIPT_DIR/main.py"
+# Create wrapper script
+sudo tee /usr/local/bin/slsync > /dev/null << EOF
+#!/bin/bash
+cd "$SCRIPT_DIR"
+source .venv/bin/activate
+exec python main.py "\$@"
+EOF
+
+# Make it executable
+sudo chmod +x /usr/local/bin/slsync
+
+echo "Wrapper script created: /usr/local/bin/slsync"
