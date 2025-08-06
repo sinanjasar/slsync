@@ -1,27 +1,32 @@
-# slsync
+# Slsync
+An automated music library manager for macOS. Slsync monitors specified download folders for new files, extracts archives, converts audio to ALAC format, organizes your music library, and handles artwork automatically.
 
-slsync monitors your specified download folder(s) for new files. it extracts zip files, recursively filters audio files with your chosen extensions, converts them to alac, and moves them to your music library. if artwork is missing, it’ll embed any included images or try to fetch artwork from the web.
+## Features
+- Monitors multiple download folders simultaneously
+- Extracts zip files
+- Recursively scans for audio files with configurable extensions
+- Converts audio to ALAC (Apple Lossless) format
+- Organizes files into your music library
+- Embeds artwork from included images or fetches from web
 
-## installation
-
-clone the repo and run:
+## Installation
+Clone the repo and run:
 ```sh
 bash setup.sh
 ```
 
-## usage
-
-start monitoring:
+## Usage
+Start monitoring:
 ```sh
 slsync
 ```
 
-## requirements
+## Requirements
+- macOS
+- Python 3.8+
+- Setup.sh handles the rest
 
-- macos
-
-## setup script
-
-- creates python venv
-- installs dependencies
-- creates symlink
+## What setup.sh does
+- Creates Python virtual environment
+- Installs dependencies
+- Creates wrapper script
