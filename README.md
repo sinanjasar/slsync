@@ -1,5 +1,5 @@
 # Slsync
-An automated music library manager for macOS. Slsync monitors specified download folders for new files, extracts archives, converts audio to ALAC format, organizes your music library, and handles artwork automatically.
+An automated music download manager for macOS. When new audio files are created in your specified download folders, slsync converts them to ALAC codec, and moves them to your music library.
 
 ## Features
 - Monitors multiple download folders simultaneously
