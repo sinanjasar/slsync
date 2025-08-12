@@ -1,4 +1,4 @@
-# slsync
+# soulsync
 
 Convenience tool for downloading music on macOS
 
