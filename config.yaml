@@ -2,10 +2,11 @@
 # Edit these paths to match your system
 
 DOWNLOAD_FOLDERS:
-  - /Users/sinanjasar/Downloads
-  - /Users/sinanjasar/Music/Soulseek/Downloads/complete
+  - 'path/to/your/downloads/folder'
   # Add more folders as needed
-DEST_FOLDER: "/Users/sinanjasar/Music/crazyniga2141/Media.localized/Automatically Add to Music.localized"
+DEST_FOLDER: "path/to/Automatically Add to Music.localized"
+
+LIBRARY_FOLDER: "path/to/your/library/folder"
 
 SUPPORTED_EXTENSIONS:
   - .mp3
@@ -15,3 +16,22 @@ SUPPORTED_EXTENSIONS:
   - .m4a
   - .ogg
   - .alac
+
+# Duplicate skipping configuration
+SKIP_DUPLICATES:
+  ENABLED: NO  # YES or NO
+  CRITERIA:
+    METADATA:
+      TITLE: NO
+      ARTIST: NO
+      ALBUM: NO
+      TRACKNUMBER: NO
+      YEAR: NO
+      GENRE: NO
+    AUDIO_PROPERTIES:
+      DURATION: YES
+      BITRATE: YES
+      SAMPLE_RATE: YES
+      CHANNELS: NO
+      CODEC: NO
+    AUDIO_HASH: NO  # YES or NO
