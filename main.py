@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
+
 import os
 import time
 import shutil
-import zipfile
-from pathlib import Path
+
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from mutagen import File as MutagenFile
-import ffmpeg
 import yaml
-from tqdm import tqdm
+
+# Import duplicate checking logic
+from duplication_helpers import extract_metadata, construct_expected_lib_path, is_duplicate
+
+# Import file manipulation logic
+from file_helpers import is_audio_file, is_alac, convert_to_alac, extract_zip
 
 # Load config from config.yaml
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -21,87 +24,60 @@ DOWNLOAD_FOLDERS = config['DOWNLOAD_FOLDERS']
 DEST_FOLDER = config['DEST_FOLDER']
 SUPPORTED_EXTENSIONS = set(config['SUPPORTED_EXTENSIONS'])
 
-# Helper functions
-def is_audio_file(filepath):
-    ext = os.path.splitext(filepath)[1].lower()
-    return ext in SUPPORTED_EXTENSIONS
-
-def is_alac(filepath):
-    audio = MutagenFile(filepath)
-    if audio and audio.info:
-        return getattr(audio.info, 'codec', None) == 'alac'
-
-def convert_to_alac(src):
-    try:
-        # Convert src to ALAC, output in same directory, same base name, .m4a extension
-        print(f"[INFO] Converting audio file to ALAC format: {src}")
-        base = os.path.splitext(os.path.basename(src))[0]
-        out_path = os.path.join(os.path.dirname(src), base + '.m4a')
-        (
-            ffmpeg
-            .input(src)
-            .output(out_path, acodec='alac', loglevel='error')
-            .overwrite_output()
-            .run()
-        )
-        if os.path.exists(out_path):
-            filename = os.path.basename(src)
-            alac_filename = os.path.basename(out_path)
-            print(f"[SUCCESS] Converted to ALAC: {filename} -> {alac_filename}")
-            os.remove(src)
-            return out_path
-        else:
-            print(f"[ERROR] Conversion failed: output file was not created for {os.path.basename(src)}")
-            return
-    except Exception as e:
-        print(f"[ERROR] Convert failed: {os.path.basename(src)} -> ALAC | {e}")
-        os.remove(out_path)
-        os.remove(src)
-        return
-
-def extract_zip(zip_path, extract_to):
-    """Extract zip file and return list of extracted files"""
-    try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-            extracted_files = [os.path.join(extract_to, name) for name in zip_ref.namelist()]
-            print(f"[INFO] Extracted {len(extracted_files)} files from {os.path.basename(zip_path)}")
-            return extracted_files
-    except Exception as e:
-        print(f"[ERROR] Failed to extract {os.path.basename(zip_path)}: {e}")
-        return []
 
 def process_file(filepath):
     """Process audio file - convert to ALAC if needed and move to destination"""
 
     print(f"[INFO] Processing audio file: {os.path.basename(filepath)}")
-    
-    # Create destination path
-    filename = os.path.basename(filepath)
-    dest_path = os.path.join(DEST_FOLDER, filename)
-    
-    # Ensure destination directory exists
-    os.makedirs(DEST_FOLDER, exist_ok=True)
+
+    # Folder locations
+    dest_folder = config.get('DEST_FOLDER')
+    library_folder = config.get('LIBRARY_FOLDER')
+
+    # Metafields for constructing path
+    path_metafields = ['artist', 'album', 'title', 'discnumber', 'DISCNUMBER', 'disc', 'discc', 'tracknumber', 'TRACKNUMBER', 'track'] 
+
+    # Extract metadata for new file path
+    metadata_for_path = extract_metadata(filepath, path_metafields)
+    try:
+        library_path = construct_expected_lib_path(library_folder, metadata_for_path, '.m4a')
+    except Exception as e:
+        print(f"[ERROR] Could not construct library path: {e}")
+        return
+
+    # Check for duplicate if enabled
+    enabled_value = config.get('SKIP_DUPLICATES', {}).get('ENABLED', 'NO')
+    print(f"[DEBUG] SKIP_DUPLICATES.ENABLED value: {enabled_value} (type: {type(enabled_value)})")
+    skip_duplicates = enabled_value is True
+
+    print(f"SKIP DUPLICATES: {skip_duplicates}")
+    print(f"LIBRARY_PATH: {library_path}")
+    if skip_duplicates and os.path.exists(library_path):        
+        dup_criteria = config.get('SKIP_DUPLICATES', {}).get('CRITERIA', {})
+        if is_duplicate(filepath, library_path, dup_criteria):
+            print(f"[DUPLICATE] Skipping duplicate: {filepath} (matches {library_path})")
+            return    
     
     try:
         if is_alac(filepath):
-            # Already ALAC, just move it
-            shutil.move(filepath, dest_path)
-            print(f"[SUCCESS] Moved ALAC file: {filename}")
+            # Already ALAC, just move it to the expected path
+            shutil.move(filepath, dest_folder)
+            print(f"[SUCCESS] Moved ALAC file: {os.path.basename(filepath)} -> {library_path}")
         else:
             # Convert to ALAC
             alac_filepath = convert_to_alac(filepath)
             if alac_filepath:
-                process_file(alac_filepath)
+                shutil.move(alac_filepath, dest_folder)
+                print(f"[SUCCESS] Moved ALAC file: {os.path.basename(alac_filepath)} -> {library_path}")
     except Exception as e:
-        print(f"[ERROR] Failed to process {filename}: {e}")
+        print(f"[ERROR] Failed to process {os.path.basename(filepath)}: {e}")
 
 def scan_directory_for_audio(directory):
     """Scan directory recursively for audio files and process them"""
     for root, dirs, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if is_audio_file(filepath):
+            if is_audio_file(filepath, SUPPORTED_EXTENSIONS):
                 process_file(filepath)
 
 class DownloadHandler(FileSystemEventHandler):
@@ -143,7 +119,7 @@ class DownloadHandler(FileSystemEventHandler):
                 
                 # Process any audio files that were extracted
                 for extracted_file in extracted_files:
-                    if os.path.isfile(extracted_file) and is_audio_file(extracted_file):
+                    if os.path.isfile(extracted_file) and is_audio_file(extracted_file, SUPPORTED_EXTENSIONS):
                         process_file(extracted_file)
                 
                 # Optionally remove the zip file after extraction
@@ -153,7 +129,7 @@ class DownloadHandler(FileSystemEventHandler):
                 except Exception as e:
                     print(f"[WARNING] Could not remove zip file: {e}")
                     
-            elif is_audio_file(filepath):
+            elif is_audio_file(filepath, SUPPORTED_EXTENSIONS):
                 # Skip invalid/corrupt .m4a files before processing
                 if filepath.lower().endswith('.m4a') and not is_alac(filepath):
                     return
@@ -168,9 +144,7 @@ class DownloadHandler(FileSystemEventHandler):
             self.on_created(event)
 
 if __name__ == '__main__':
-    # Ensure destination folder exists
-    os.makedirs(DEST_FOLDER, exist_ok=True)
-    
+
     # Initial scan of existing files in download folders
     print("[INFO] Performing initial scan of download folders...")
     for folder in DOWNLOAD_FOLDERS:
