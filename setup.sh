@@ -24,7 +24,8 @@ pip install \
     'ffmpeg-python>=0.2,<1.0' \
     'pyyaml>=6.0,<7.0' \
     'requests>=2.28,<3.0' \
-    'tqdm>=4.64,<5.0'
+    'tqdm>=4.64,<5.0' \
+    'pydub>=0.25,<1.0'
 
 echo "Dependencies installed in $VENV_DIR."
 
