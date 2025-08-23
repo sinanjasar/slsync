@@ -1,5 +1,5 @@
 # soulsync
-
+ 
 Convenience tool for downloading music on macOS
 
 ## What it does
