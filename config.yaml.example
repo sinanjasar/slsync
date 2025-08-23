@@ -1,0 +1,47 @@
+# slsync config file (example)
+# Copy this file to 'config.yaml' and edit the values to match your system.
+
+# List of folders to scan for new downloads.
+DOWNLOAD_FOLDERS:
+  - "/path/to/your/download/folder"
+  # - "/another/download/folder"  # Add more folders as needed
+
+# Folder where new music files should be imported (e.g., your Music app's "Automatically Add" folder).
+DEST_FOLDER: "/path/to/your/music/library/Media.localized/Automatically Add to Music.localized"
+
+# Main music library folder (used for duplicate checking).
+LIBRARY_FOLDER: "/path/to/your/music/library/Media.localized/Music"
+
+# Supported audio file extensions.
+SUPPORTED_EXTENSIONS:
+  - .mp3
+  - .flac
+  - .wav
+  - .aac
+  - .m4a
+  - .ogg
+  - .alac
+
+# Duplicate skipping configuration
+SKIP_DUPLICATES:
+  ENABLED: NO  # Set to YES to enable duplicate skipping, NO to disable.
+  CRITERIA:
+    METADATA:
+      TITLE: NO      # YES to compare song title
+      ARTIST: NO     # YES to compare artist
+      ALBUM: NO      # YES to compare album
+      TRACKNUMBER: NO # YES to compare track number
+      YEAR: NO       # YES to compare year
+      GENRE: NO      # YES to compare genre
+    AUDIO_PROPERTIES:
+      DURATION: YES      # YES to compare audio duration
+      BITRATE: YES       # YES to compare bitrate
+      SAMPLE_RATE: YES   # YES to compare sample rate
+      CHANNELS: NO       # YES to compare number of channels
+      CODEC: NO          # YES to compare audio codec
+    AUDIO_HASH: NO       # YES to compare audio hash (exact audio match)
+
+# Instructions:
+# 1. Copy this file to 'config.yaml'
+# 2. Edit the paths and options above to match your setup
+# 3. Do not commit your personal 'config.yaml' to version control
